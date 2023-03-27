@@ -141,7 +141,7 @@ describe('UserModule (e2e)', () => {
 		});
 	});
 
-	describe('userProfile', () =);
+	// describe('userProfile', () =);
 	it.todo('me');
 	it.todo('verifyEmail');
 	it.todo('editProfile');
