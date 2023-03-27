@@ -15,7 +15,7 @@ import { MailModule } from './mail/mail.module';
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: '.env',
+			envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
 			ignoreEnvFile: process.env.NODE_ENV === 'production',
 			validationSchema: Joi.object({
 				NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
@@ -43,7 +43,7 @@ import { MailModule } from './mail/mail.module';
 			password: process.env.DB_PASSWORD,
 			database: process.env.DB_NAME,
 			synchronize: process.env.NODE_ENV !== 'production',
-			logging: process.env.NODE_ENV !== 'production',
+			logging: process.env.NODE_ENV === 'development',
 			entities: [User, Verification],
 		}),
 		JwtModule.forRoot({
