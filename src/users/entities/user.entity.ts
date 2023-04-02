@@ -1,21 +1,22 @@
 import { Field, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Entity, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
-import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { Entity, Column, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
+import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
 import { CoreEntity } from '../../common/entities/core.entity';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
+import { Restaurant } from '../../restaurants/entities/restaurant.entity';
 
 // El enum me mapeara en mi base de datos estos roles como [0, 1, 2]
-enum UserRole {
-	Client,
-	Owner,
-	Delivery,
+export enum UserRole {
+	Client = 'Client',
+	Owner = 'Owner',
+	Delivery = 'Delivery',
 }
 
 // Creo un enum para GraphQL
 registerEnumType(UserRole, { name: 'UserRole' });
 
-@InputType({ isAbstract: true })
+@InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class User extends CoreEntity {
@@ -37,7 +38,12 @@ export class User extends CoreEntity {
 
 	@Field(() => Boolean)
 	@Column({ default: false })
+	@IsBoolean()
 	verified: boolean;
+
+	@Field(() => [Restaurant])
+	@OneToMany(() => Restaurant, restaurant => restaurant.owner)
+	restaurants: Restaurant[];
 
 	@BeforeInsert()
 	@BeforeUpdate()
