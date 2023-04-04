@@ -8,6 +8,8 @@ import { Restaurant } from './entities/restaurant.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dtos/delete-restaurant.dto';
+import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -81,6 +83,43 @@ export class RestaurantsService {
 			return { ok: true };
 		} catch (error) {
 			return { ok: false, error: 'Could not delete restaurant' };
+		}
+	}
+
+	countRestaurants(category: Category): Promise<number> {
+		return this.restaurants.countBy({ category: { id: category.id } });
+	}
+
+	async allRestaurants({ page }: RestaurantsInput): Promise<RestaurantsOutput> {
+		try {
+			const [restaurants, totalResult] = await this.restaurants.findAndCount({
+				take: 25,
+				skip: (page - 1) * 25,
+			});
+
+			if (!restaurants) {
+				return { ok: false, error: 'Restaurants not found' };
+			}
+
+			const totalPages = Math.ceil(totalResult / 25);
+
+			return { ok: true, totalPages, totalResult, results: restaurants };
+		} catch (error) {
+			return { ok: false, error: 'Could not load restaurants' };
+		}
+	}
+
+	async findRestaurantById({ restaurantId }: RestaurantInput): Promise<RestaurantOutput> {
+		try {
+			const restaurant = await this.restaurants.findOneBy({ id: restaurantId });
+
+			if (!restaurant) {
+				return { ok: false, error: 'Restaurant not found' };
+			}
+
+			return { ok: true, restaurant };
+		} catch (error) {
+			return { ok: false, error: 'Could not find restaturant' };
 		}
 	}
 }
