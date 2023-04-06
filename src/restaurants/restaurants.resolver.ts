@@ -9,6 +9,7 @@ import { EditRestaurantOutput, EditRestaurantInput } from './dtos/edit-restauran
 import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dtos/delete-restaurant.dto';
 import { RestaurantsOutput, RestaurantsInput } from './dtos/restaurants.dto';
 import { RestaurantOutput, RestaurantInput } from './dtos/restaurant.dto';
+import { SearchRestaurantOutput, SearchRestaurantInput } from './dtos/search-restaurant.dto';
 
 @Resolver(() => Restaurant)
 export class RestaurantResolver {
@@ -49,5 +50,10 @@ export class RestaurantResolver {
 	@Query(() => RestaurantOutput)
 	restaurant(@Args('input') restaurantInput: RestaurantInput): Promise<RestaurantOutput> {
 		return this.restaurantsService.findRestaurantById(restaurantInput);
+	}
+
+	@Query(() => SearchRestaurantOutput)
+	searchRestaurant(@Args('input') searchRestaurantInput: SearchRestaurantInput): Promise<SearchRestaurantOutput> {
+		return this.restaurantsService.searchRestaurantByName(searchRestaurantInput);
 	}
 }
