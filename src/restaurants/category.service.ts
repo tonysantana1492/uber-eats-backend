@@ -14,6 +14,7 @@ export class CategoryService {
 		@InjectRepository(Restaurant) private readonly restaurants: Repository<Restaurant>,
 		private readonly restaurantsService: RestaurantsService,
 	) {}
+
 	async allCategories(): Promise<AllCategoriesOutput> {
 		try {
 			const categories = await this.categories.find();
