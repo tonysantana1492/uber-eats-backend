@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +7,6 @@ import * as Joi from 'joi';
 import { UserModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
-import { JwtMiddleware } from './jwt/jwt.middleware';
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 import { Restaurant } from './restaurants/entities/restaurant.entity';
@@ -18,6 +17,7 @@ import { Dish } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
 	imports: [
@@ -41,7 +41,21 @@ import { OrderItem } from './orders/entities/order-item.entity';
 		GraphQLModule.forRoot<ApolloDriverConfig>({
 			driver: ApolloDriver,
 			autoSchemaFile: true,
-			context: ({ req }) => ({ user: req.user }), // La propiedad definida en el context estra disponible para mis resolvers
+			// Esto se dispara luego de los middlewares y antes que los guards
+			// Es lo que Graphql inserta en su contexto cuando recibe un peticion http/https
+			context: ({ req }) => ({ headers: req.headers }),
+			// Es lo que Graphql inserta en su contexto cuando recibe un peticion ws para usar luego en AuthGuard por ejemplo
+			subscriptions: {
+				// Activa websocket en nuestro servidor
+				'subscriptions-transport-ws': {
+					onConnect: connectionParams => {
+						const connectionParamsToLowerCase = Object.fromEntries(
+							Object.entries(connectionParams).map(([key, value]) => [key.toLocaleLowerCase(), value]),
+						);
+						return { headers: connectionParamsToLowerCase };
+					},
+				},
+			},
 		}),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
@@ -51,7 +65,8 @@ import { OrderItem } from './orders/entities/order-item.entity';
 			password: process.env.DB_PASSWORD,
 			database: process.env.DB_NAME,
 			synchronize: process.env.NODE_ENV !== 'production',
-			logging: process.env.NODE_ENV === 'development',
+			// logging: process.env.NODE_ENV === 'development',
+			logging: false,
 			entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
 		}),
 		JwtModule.forRoot({
@@ -62,6 +77,7 @@ import { OrderItem } from './orders/entities/order-item.entity';
 			domain: process.env.MAIL_GUN_DOMAIN_NAME,
 			fromEmail: process.env.MAIL_GUN_FROM_MAIL,
 		}),
+		CommonModule,
 		AuthModule,
 		UserModule,
 		RestaurantsModule,
@@ -70,12 +86,4 @@ import { OrderItem } from './orders/entities/order-item.entity';
 	controllers: [],
 	providers: [],
 })
-export class AppModule implements NestModule {
-	configure(consumer: MiddlewareConsumer) {
-		consumer.apply(JwtMiddleware).forRoutes({
-			// aplico el middleware creado  al modulo general y defino a cuales rutas y metodos lo voy a aplicar
-			path: '/graphql',
-			method: RequestMethod.ALL,
-		});
-	}
-}
+export class AppModule {}
