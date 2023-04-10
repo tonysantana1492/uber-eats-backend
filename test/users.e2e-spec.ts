@@ -6,6 +6,12 @@ import * as request from 'supertest';
 import { User } from '../src/users/entities/user.entity';
 import { Verification } from '../src/users/entities/verification.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { TOKEN_KEY } from 'src/common/common.constants';
+import { OrderItem } from 'src/orders/entities/order-item.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import { Category } from 'src/restaurants/entities/category.entity';
+import { Dish } from 'src/restaurants/entities/dish.entity';
+import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
@@ -23,7 +29,7 @@ const dataSource = new DataSource({
 	database: process.env.DB_NAME,
 	synchronize: process.env.NODE_ENV !== 'production',
 	logging: process.env.NODE_ENV === 'development',
-	entities: [User, Verification],
+	entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
 });
 
 describe('UserModule (e2e)', () => {
@@ -34,7 +40,7 @@ describe('UserModule (e2e)', () => {
 
 	const baseTest = () => request(app.getHttpServer()).post(GRAPHQL_ENDPOINT);
 	const publicTest = (query: string) => baseTest().send({ query });
-	const privateTest = (query: string) => baseTest().set('X-JWT', jwtToken).send({ query });
+	const privateTest = (query: string) => baseTest().set(TOKEN_KEY, jwtToken).send({ query });
 
 	beforeAll(async () => {
 		const module: TestingModule = await Test.createTestingModule({
