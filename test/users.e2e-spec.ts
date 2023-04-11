@@ -12,6 +12,7 @@ import { Order } from 'src/orders/entities/order.entity';
 import { Category } from 'src/restaurants/entities/category.entity';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 const GRAPHQL_ENDPOINT = '/graphql';
 
@@ -29,7 +30,7 @@ const dataSource = new DataSource({
 	database: process.env.DB_NAME,
 	synchronize: process.env.NODE_ENV !== 'production',
 	logging: process.env.NODE_ENV === 'development',
-	entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
+	entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment],
 });
 
 describe('UserModule (e2e)', () => {
