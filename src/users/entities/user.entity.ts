@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Restaurant } from '../../restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 // El enum me mapeara en mi base de datos estos roles como [0, 1, 2]
 export enum UserRole {
@@ -53,6 +54,10 @@ export class User extends CoreEntity {
 	@Field(() => [Order])
 	@OneToMany(() => Order, order => order.driver)
 	rides: Order[];
+
+	@Field(() => [Payment])
+	@OneToMany(() => Payment, payment => payment.user, { eager: true })
+	payments: Payment[];
 
 	@BeforeInsert()
 	@BeforeUpdate()
