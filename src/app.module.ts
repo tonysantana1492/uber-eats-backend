@@ -18,6 +18,9 @@ import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { CommonModule } from './common/common.module';
+import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
 	imports: [
@@ -67,7 +70,7 @@ import { CommonModule } from './common/common.module';
 			synchronize: process.env.NODE_ENV !== 'production',
 			// logging: process.env.NODE_ENV === 'development',
 			logging: false,
-			entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
+			entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment],
 		}),
 		JwtModule.forRoot({
 			privateKey: process.env.PRIVATE_KEY,
@@ -77,11 +80,13 @@ import { CommonModule } from './common/common.module';
 			domain: process.env.MAIL_GUN_DOMAIN_NAME,
 			fromEmail: process.env.MAIL_GUN_FROM_MAIL,
 		}),
+		ScheduleModule.forRoot(),
 		CommonModule,
 		AuthModule,
 		UserModule,
 		RestaurantsModule,
 		OrdersModule,
+		PaymentsModule,
 	],
 	controllers: [],
 	providers: [],
