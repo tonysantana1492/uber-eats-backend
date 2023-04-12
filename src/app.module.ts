@@ -30,6 +30,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 			ignoreEnvFile: process.env.NODE_ENV === 'production',
 			validationSchema: Joi.object({
 				NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
+				APP_PORT: Joi.string().required(),
 				DB_HOST: Joi.string().required(),
 				DB_PORT: Joi.string().required(),
 				DB_USERNAME: Joi.string().required(),
