@@ -29,7 +29,7 @@ export class Restaurant extends CoreEntity {
 	address: string;
 
 	@Field(() => Category, { nullable: true })
-	@ManyToOne(() => Category, category => category.restaurants, { nullable: true, onDelete: 'SET NULL' }) // Si la categoria es eliminada este campo se pone a null
+	@ManyToOne(() => Category, category => category.restaurants, { nullable: true, onDelete: 'SET NULL', eager: true }) // Si la categoria es eliminada este campo se pone a null
 	category: Category;
 
 	@Field(() => User)
