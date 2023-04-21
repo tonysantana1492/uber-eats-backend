@@ -52,7 +52,7 @@ export class CategoryService {
 			const totalResults = await this.restaurantsService.countRestaurants(category);
 			const totalPages = Math.ceil(totalResults / 25);
 
-			return { ok: true, category, totalPages };
+			return { ok: true, category, totalPages, restaurants };
 		} catch (error) {
 			return { ok: false, error: 'Could not load category' };
 		}
