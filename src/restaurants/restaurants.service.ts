@@ -11,6 +11,7 @@ import { DeleteRestaurantOutput, DeleteRestaurantInput } from './dtos/delete-res
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { SearchRestaurantOutput, SearchRestaurantInput } from './dtos/search-restaurant.dto';
+import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -131,6 +132,28 @@ export class RestaurantsService {
 			return { ok: true, restaurant };
 		} catch (error) {
 			return { ok: false, error: 'Could not find restaturant' };
+		}
+	}
+
+	async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
+		try {
+			const restaurants = await this.restaurants.find({
+				where: {
+					owner: {
+						id: owner.id,
+					},
+				},
+			});
+
+			if (!restaurants) {
+				return { ok: false, error: 'You dont have any restaurants' };
+			}
+
+			return { ok: true, restaurants };
+		} catch (error) {
+			console.log(error);
+
+			return { ok: false, error: 'Could not find restaurants' };
 		}
 	}
 
