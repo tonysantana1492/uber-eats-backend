@@ -12,6 +12,7 @@ import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { SearchRestaurantOutput, SearchRestaurantInput } from './dtos/search-restaurant.dto';
 import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
+import { MyRestaurantInput, MyRestaurantOutput } from './dtos/my-restaurant.dto';
 
 @Injectable()
 export class RestaurantsService {
@@ -31,7 +32,7 @@ export class RestaurantsService {
 			newRestaurant.category = category;
 			await this.restaurants.save(newRestaurant);
 
-			return { ok: true };
+			return { ok: true, restaurantId: newRestaurant.id };
 		} catch (error) {
 			return { ok: false, error: 'Could not create restaurant' };
 		}
@@ -154,6 +155,31 @@ export class RestaurantsService {
 			console.log(error);
 
 			return { ok: false, error: 'Could not find restaurants' };
+		}
+	}
+
+	async myRestaurant(owner: User, { id }: MyRestaurantInput): Promise<MyRestaurantOutput> {
+		try {
+			const restaurant = await this.restaurants.findOne({
+				where: {
+					id,
+					owner: {
+						id: owner.id,
+					},
+				},
+				relations: {
+					menu: true,
+					orders: true,
+				},
+			});
+
+			if (!restaurant) {
+				return { ok: false, error: 'You dont have any restaurant' };
+			}
+
+			return { ok: true, restaurant };
+		} catch (error) {
+			return { ok: false, error: 'Could not find restaurant' };
 		}
 	}
 
