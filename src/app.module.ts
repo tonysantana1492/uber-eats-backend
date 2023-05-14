@@ -21,6 +21,9 @@ import { CommonModule } from './common/common.module';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
 	imports: [
@@ -30,6 +33,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 			ignoreEnvFile: process.env.NODE_ENV === 'production',
 			validationSchema: Joi.object({
 				NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
+				APP_URL: Joi.string().required(),
 				APP_PORT: Joi.string().required(),
 				DB_HOST: Joi.string().required(),
 				DB_PORT: Joi.string().required(),
@@ -40,6 +44,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 				MAIL_GUN_API_KEY: Joi.string().required(),
 				MAIL_GUN_DOMAIN_NAME: Joi.string().required(),
 				MAIL_GUN_FROM_MAIL: Joi.string().required(),
+				AWS_KEY: Joi.string().required(),
+				AWS_SECRET: Joi.string().required(),
+				BUCKET_NAME: Joi.string().required(),
 			}),
 		}),
 		GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -60,6 +67,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 					},
 				},
 			},
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', 'public'),
 		}),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
@@ -88,6 +98,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 		RestaurantsModule,
 		OrdersModule,
 		PaymentsModule,
+		UploadsModule,
 	],
 	controllers: [],
 	providers: [],
