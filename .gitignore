@@ -117,3 +117,6 @@ yarn.lock
 .yarn/install-state.gz
 .pnp.*
 .DS_Store
+
+# Static files
+public/
